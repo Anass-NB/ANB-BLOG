@@ -5,7 +5,7 @@ function table_post_row(res) {
   if (res.posts.length <= 0) {
     htmlView += `
     <tr>
-      <td colspan="7">No data.</td>
+      <td colspan="8">No data.</td>
      </tr>`;
   }
 
@@ -16,20 +16,55 @@ function table_post_row(res) {
         <td>` +
       (i + 1) +
       `</td>
-        <td>` + res.posts[i].title + `</td>
-        <td>` + res.posts[i].summary + `</td>
-        <td>` + res.posts[i].category_id + `</td>
-        <td>` + res.posts[i].user_id + `</td>
-        <td>` + (res.posts[i].status == 1 ? `<span class="badge text-bg-success">published</span>` : `<span class="badge text-bg-danger">Not publish</span>`) + `</td>
+        <td>` +
+      res.posts[i].title +
+      `</td>
+        <td>` +
+      res.posts[i].summary +
+      `</td>
+        <td>` +
+      res.posts[i].category.name +
+      `</td>
+        <td>` +
+      res.posts[i].author.name +
+      `</td>
+        <td>` +
+      (res.posts[i].status == 1
+        ? `<span class="badge text-bg-success">published</span>`
+        : `<span class="badge text-bg-danger">Not publish</span>`) +
+      `</td>
         <td>
           <button id="editModal" data-action="/post/update" data-id="res.posts[i].id" class="btn btn-warning btn-sm">
             Edit
           </button>
-          <button id="btn-delete" data-id="1" class="btn btn-danger btn-sm">
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#delete-`+ res.posts[i].id + `">
             Delete
           </button>
         </td>
-      </tr>`;
+      </tr>
+
+              <div class="modal fade" id="delete-`+ res.posts[i].id + `" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Post</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <input type="text" value="">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-sm btn-primary">Delete Post</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+      `;
   }
   $("#tbody").html(htmlView);
 }
@@ -55,10 +90,10 @@ function showPosts() {
 // function for show posts without refresh
 showPosts();
 
-$(document).ajaxStart(function() {
+$(document).ajaxStart(function () {
   $(".loader").show();
 });
-$(document).ajaxStart(function() {
+$(document).ajaxStart(function () {
   $(".loader").hide();
 });
 // add post
@@ -82,6 +117,13 @@ $(document).ready(function () {
       contentType: false,
       cache: false,
       processData: false,
+      beforeSend: function () {
+        $('#btn-create').addClass("disabled").html("Processing...").attr('disabled', true);
+        $(document).find('span.error-text').text('');
+      },
+      complete: function () {
+        $('#btn-create').removeClass("disabled").html("Save Changes").attr('disabled', false);
+      },
       success: function (response) {
         if (response.success == true) {
           $(form).trigger("reset");
@@ -90,9 +132,16 @@ $(document).ready(function () {
           showPosts();
         }
       },
-      error: function (response) {},
+      error: function (data) {
+        $.each(data.errors,function(key,value) {
+          console.log(data.errors);
+          console.log(key);
+          console.log(value[0]);
+          $('.'+key+'_error').text(value[0]);
+          });
+
+
+      },
     });
   });
 });
-
-

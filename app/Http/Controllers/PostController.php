@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\User;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,7 +18,7 @@ class PostController extends Controller
 
   public function index(Request $request)
   {
-    $posts = Post::all();
+    $posts = Post::all()->load(["category","author"]);
     $categories = Category::all();
     $users = User::all();
 
@@ -25,8 +26,8 @@ class PostController extends Controller
       return response()->json([
         'success' => true,
         "posts" => $posts,
-        "categories" => $categories,
-        "users" => $users,
+        // "categories" => $categories,
+        // "users" => $users,
       ]);
     }
 
@@ -42,7 +43,12 @@ class PostController extends Controller
   public function store(StorePostRequest $request)
   {
 
-    $request->validated();
+    $validated = Validator::make($request->all());
+    if($validated->fails()){
+      return response()->json([
+        "errors" => $validated->errors()->all(),
+      ]);
+    }
     $post = new Post();
     $post->title = $request->title;
     $post->slug = Str::slug($request->title);
@@ -57,9 +63,10 @@ class PostController extends Controller
       $post->photo = $file_name;
     }
     $post->save();
-    notify()->success("Post added with success", "Adding post");
+
     return response()->json([
       "success" => true,
+      'message' => 'Success created post',
     ]);
   }
 

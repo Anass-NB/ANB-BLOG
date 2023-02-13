@@ -76,9 +76,7 @@
                             <div class="form-floating mb-3 ">
                               <input name="title" value="{{ old('title') }}" type="text" class="form-control"
                                 id="floatingInput" placeholder="title">
-                              @error('title')
-                                <div class="alert alert-danger">{{ $message }}</div>
-                              @enderror
+                              <span class="text-danger error-text title_error" style="font-size: 13px"></span>
                               <label for="floatingInput">Post Title</label>
                             </div>
                           </div>
@@ -87,9 +85,7 @@
 
                               <input name="summary" value="{{ old('summary') }}" type="text" class="form-control"
                                 id="floatingPassword" placeholder="Summary">
-                              @error('summary')
-                                <div class="alert alert-danger">{{ $message }}</div>
-                              @enderror
+                              <span class="text-danger error-text summary_error" style="font-size: 13px"></span>
 
                               <label for="floatingPassword">Summary</label>
                             </div>
@@ -101,9 +97,7 @@
                                 <option value="0">0</option>
                                 <option value="1">1</option>
                               </select>
-                              @error('status')
-                                <div class="alert alert-danger">{{ $message }}</div>
-                              @enderror
+                              <span class="text-danger error-text status_error" style="font-size: 13px"></span>
                               <label for="floatingSelect">Status</label>
                             </div>
                           </div>
@@ -116,9 +110,7 @@
                                     {{ $user->name }}</option>
                                 @endforeach
                               </select>
-                              @error('author')
-                                <div class="alert alert-danger">{{ $message }}</div>
-                              @enderror
+                              <span class="text-danger error-text author_error" style="font-size: 13px"></span>
                               <label for="floatingSelect">Author</label>
                             </div>
                           </div>
@@ -130,9 +122,8 @@
                             <div class="form-floating mb-3  ">
 
                               <textarea name="content" class="summernote">{{ old('content') }}</textarea>
-                              @error('content')
-                                <div class="alert alert-danger">{{ $message }}</div>
-                              @enderror
+                              <span class="text-danger error-text content_error" style="font-size: 13px"></span>
+
                               {{-- <input type="text" name="content" id="your_summernote" class="form-control"
                               style="height: 200px;"> --}}
 
@@ -144,6 +135,8 @@
                                   <label for="formFileSm" class="form-label">Photos</label>
                                   <input name="photo" class="form-control form-control-sm" id="formFileSm"
                                     type="file">
+                                  <span class="text-danger error-text photo_error" style="font-size: 13px"></span>
+
                                 </div>
                               </div>
                               <div class="col-3">
@@ -166,7 +159,7 @@
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-primary">Save changes</button>
+                          <button type="submit" id="btn-create" class="btn btn-primary">Save changes</button>
                         </div>
                       </div>
 
