@@ -66,7 +66,7 @@ class PostController extends Controller
     $post->user_id = $request->author;
     if ($request->hasFile("photo")) {
       $file_name = $request->file("photo")->getClientOriginalName();
-      $request->file("photo")->storeAs("photos/posts/" . $request->title, $file_name, "upload_photos");
+      $request->file("photo")->storeAs("photos/posts/".now()."-". $request->title, $file_name, "upload_photos");
       $post->photo = $file_name;
     }
     $post->save();
@@ -103,8 +103,6 @@ class PostController extends Controller
       return response()->json($validator->errors(), 400);
     }
     $post = Post::findOrFail($id);
-
-    $post_photos = $post->photos;
     $post->title = $request->title;
     $post->slug = Str::slug($request->title);
     $post->summary = $request->summary;
@@ -112,24 +110,6 @@ class PostController extends Controller
     $post->content = $request->content;
     $post->category_id = $request->category;
     $post->user_id = $request->author;
-    $post->photos = $request;
-
-    $arr = array();
-    return count($request->photos);
-
-    if ($request->hasFile("photos")) {
-      return "hasss";
-      foreach ($request->file("photos") as $photo) {
-        $file_name = $photo->getClientOriginalName();
-        $photo->storeAs("photos/posts/" . $request->title, $file_name, "upload_photos");
-        array_push($arr, $photo->getClientOriginalName());
-      }
-    } else {
-      return "donnnt";
-      //upload new photos
-
-    }
-    $post->photos = $arr;
     $post->save();
     return response()->json([
       'success' => true,

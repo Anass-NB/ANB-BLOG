@@ -38,7 +38,7 @@ function table_post_row(res) {
         <button id="" data-action="/post/update" data-id="res.posts[i].id" class="btn btn-secondary btn-sm">
           Show
         </button>
-        <button id="editPost" data-action="http://127.0.0.1:8000/admin/post/"` + res.posts[i].id + `/update" data-id="` + res.posts[i].id + `" class="btn btn-warning btn-sm">
+        <button id="editPost" data-action="http://127.0.0.1:8000/admin/post/` + res.posts[i].id + `/update" data-id="` + res.posts[i].id + `" class="btn btn-warning btn-sm">
           Edit
         </button>
         <button id="btn-delete" data-id="`+ res.posts[i].id + `" class="btn btn-danger btn-sm">
@@ -82,24 +82,27 @@ $(document).ajaxStart(function () {
 });
 
 //Add Post Ajax
-$(document).ready(function () {
+$('#openModal').click(function() {
+  let url = $(this).data('action');
+  $('#formData').attr('action',url);
+  })
+
+
+
   table = "#posts-table";
   modal = "#add-posts-modal";
-  form = "#add-post-form";
 
-  $(form).on("submit", function (event) {
+  $("#formData").on("submit", function (event) {
     event.preventDefault();
-
-    var url = $(this).attr("data-action");
+    var url = $("#openModel").attr("data-action");
     console.log(url);
 
     $.ajax({
-      url: url,
+      url: $(this).attr("action"),
       method: "POST",
       data: new FormData(this),
       dataType: "JSON",
       contentType: false,
-      cache: false,
       processData: false,
       beforeSend: function () {
         $('#btn-create').addClass("disabled").html("Processing...").attr('disabled', true);
@@ -110,10 +113,15 @@ $(document).ready(function () {
       },
       success: function (response) {
         if (response.success == true) {
-          $(form).trigger("reset");
+          $("#formData").trigger("reset");
           $(modal).modal("hide");
           console.log("post addeed ");
           showPosts();
+          Swal.fire(
+            'Success!',
+            "Post added",
+            'success'
+            )
         }
       },
       error: function (err) {
@@ -125,7 +133,7 @@ $(document).ready(function () {
       },
     });
   });
-});
+
 
 
 
@@ -172,19 +180,22 @@ $(document).on('click', 'button#btn-delete', function (e) {
 
 
 //Edit Post AJAX
-//open edit modal
-$(document).on('click', 'button#editPost', function () {
+
+$(document).on('click', '#editPost', function () {
   let id = $(this).data('id');
   let dataAction = $(this).data('action');
-  $('#formData').attr('action', dataAction);
+  $('#formData').attr('action',dataAction);
+
   $.ajax({
     type: 'GET',
     url: `http://127.0.0.1:8000/admin/post/${id}/edit`,
     dataType: "json",
     success: function (res) {
-      $('input[name=title]').val(res.post.title);
-      $('textarea[name=content]').val(res.post.content);
       $('#add-posts-modal').modal('show');
+      $('input[name=title]').val(res.post.title);
+      $('input[name=summary]').val(res.post.summary);
+      $('input[name=status]').val(res.post.status);
+      $('textarea[name=content]').val(res.post.content);
       console.log(res);
     },
     error: function (error) {

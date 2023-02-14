@@ -35,11 +35,11 @@
         <div class="bg-light rounded h-100 p-4">
           <h6 class="mb-4">All Posts Table</h6>
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-posts-modal">
+          <button type="button" id="openModal" class="btn btn-info btn-sm" data-action="{{ route('post.store') }}"
+            data-bs-toggle="modal" data-bs-target="#add-posts-modal">
             New Post
           </button>
           <table class="table table-hover table-responsive" id="posts-table">
-
             <thead>
               <tr>
                 <th scope="row">#</th>
@@ -60,16 +60,15 @@
             </tbody>
 
             <!--Add Modal -->
-            <div class="modal fade" id="add-posts-modal" tabindex="-1" id="exampleModal"
-              aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="add-posts-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
               <div class="modal-dialog modal-xl ">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Post</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <form data-action="{{ route('post.store') }}" method="post" enctype="multipart/form-data"
-                    id="add-post-form">
+                  <form method="post" enctype="multipart/form-data" id="formData">
                     @csrf
                     <div class="modal-body">
                       <div class="bg-light rounded h-100 p-4">
@@ -162,7 +161,8 @@
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" id="btn-create" class="btn btn-primary">Save changes</button>
+                          <button type="submit" id="btn-create" class="btn btn-primary">Save
+                            changes</button>
                         </div>
                       </div>
 
