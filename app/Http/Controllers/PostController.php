@@ -18,7 +18,7 @@ class PostController extends Controller
 
   public function index(Request $request)
   {
-    $posts = Post::all()->load(["category","author"]);
+    $posts = Post::all()->load(["category", "author"]);
     $categories = Category::all();
     $users = User::all();
 
@@ -31,7 +31,7 @@ class PostController extends Controller
       ]);
     }
 
-    return view("back.index",compact("users","categories"));
+    return view("back.index", compact("users", "categories"));
   }
 
   /**
@@ -40,14 +40,21 @@ class PostController extends Controller
    * @return \Illuminate\Http\Response
    */
 
-  public function store(StorePostRequest $request)
+  public function store(Request $request)
   {
 
-    $validated = Validator::make($request->all());
-    if($validated->fails()){
-      return response()->json([
-        "errors" => $validated->errors()->all(),
-      ]);
+    $validator  = Validator::make($request->all(), [
+      "title" => "required|unique:posts",
+      "summary" => "required",
+      "content" => "required",
+      "status" => "required",
+      "photo" => "required",
+      "category" => "required",
+      "author" => "required",
+
+    ]);
+    if ($validator->fails()) {
+      return response()->json($validator->errors(), 400);
     }
     $post = new Post();
     $post->title = $request->title;
@@ -71,48 +78,63 @@ class PostController extends Controller
   }
 
 
-
-
-
-  public function update(StorePostRequest $request)
+  public function edit($id)
   {
+    $post = Post::where("id", $id)->first();
+    return response()->json([
+      'success' => true,
+      'post' => $post
+    ]);
+  }
 
-    try {
-      $request->validated();
-      $post = Post::findOrFail($request->id);
 
-      $post_photos = $post->photos;
-      $post->title = $request->title;
-      $post->slug = Str::slug($request->title);
-      $post->summary = $request->summary;
-      $post->status = $request->status;
-      $post->content = $request->content;
-      $post->category_id = $request->category;
-      $post->user_id = $request->author;
-      $post->photos = $request;
-
-      $arr = array();
-      return count($request->photos);
-
-      if ($request->hasFile("photos")) {
-        return "hasss";
-        foreach ($request->file("photos") as $photo) {
-          $file_name = $photo->getClientOriginalName();
-          $photo->storeAs("photos/posts/" . $request->title, $file_name, "upload_photos");
-          array_push($arr, $photo->getClientOriginalName());
-        }
-      } else {
-        return "donnnt";
-        //upload new photos
-        $arr = $post_photos;
-      }
-      $post->photos = $arr;
-      $post->save();
-      notify()->success("Post updated with success", "update post");
-      return redirect()->route("posts.index");
-    } catch (\Exception $ex) {
-      return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
+  public function update(Request $request, $id)
+  {
+    $validator = Validator::make($request->all(), [
+      "title" => "required|unique:posts",
+      "summary" => "required",
+      "content" => "required",
+      "status" => "required",
+      "photo" => "required",
+      "category" => "required",
+      "author" => "required",
+    ]);
+    if ($validator->fails()) {
+      return response()->json($validator->errors(), 400);
     }
+    $post = Post::findOrFail($id);
+
+    $post_photos = $post->photos;
+    $post->title = $request->title;
+    $post->slug = Str::slug($request->title);
+    $post->summary = $request->summary;
+    $post->status = $request->status;
+    $post->content = $request->content;
+    $post->category_id = $request->category;
+    $post->user_id = $request->author;
+    $post->photos = $request;
+
+    $arr = array();
+    return count($request->photos);
+
+    if ($request->hasFile("photos")) {
+      return "hasss";
+      foreach ($request->file("photos") as $photo) {
+        $file_name = $photo->getClientOriginalName();
+        $photo->storeAs("photos/posts/" . $request->title, $file_name, "upload_photos");
+        array_push($arr, $photo->getClientOriginalName());
+      }
+    } else {
+      return "donnnt";
+      //upload new photos
+
+    }
+    $post->photos = $arr;
+    $post->save();
+    return response()->json([
+      'success' => true,
+      'message' => 'Success Updated post',
+    ]);
   }
 
   /**
@@ -121,20 +143,18 @@ class PostController extends Controller
    * @param  \App\Models\Post  $post
    * @return \Illuminate\Http\Response
    */
-  public function destroy(Request $request)
+  public function destroy($id)
   {
-    try {
-      $post = Post::findOrFail($request->id);
-      $url = "photos/posts/" . $post->title . "/*";
+    $post = Post::findOrFail($id);
+    $url = "photos/posts/" . $post->title . "/*";
 
-      foreach (glob($url) as  $file) {
-        unlink($file);
-      }
-      $post->delete();
-      notify()->success("Post deleted with success", "delete post");
-      return redirect()->route("posts.index");
-    } catch (\Exception $ex) {
-      return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
+    foreach (glob($url) as  $file) {
+      unlink($file);
     }
+    $post->delete();
+    return response()->json([
+      'success' => true,
+      'message' => 'Success Deleted post',
+    ]);
   }
 }

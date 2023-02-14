@@ -34,34 +34,18 @@ function table_post_row(res) {
         : `<span class="badge text-bg-danger">Not publish</span>`) +
       `</td>
         <td>
-          <button id="editModal" data-action="/post/update" data-id="res.posts[i].id" class="btn btn-warning btn-sm">
-            Edit
-          </button>
-          <!-- Button trigger modal -->
-          <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#delete-`+ res.posts[i].id + `">
-            Delete
-          </button>
+
+        <button id="" data-action="/post/update" data-id="res.posts[i].id" class="btn btn-secondary btn-sm">
+          Show
+        </button>
+        <button id="editPost" data-action="http://127.0.0.1:8000/admin/post/"` + res.posts[i].id + `/update" data-id="` + res.posts[i].id + `" class="btn btn-warning btn-sm">
+          Edit
+        </button>
+        <button id="btn-delete" data-id="`+ res.posts[i].id + `" class="btn btn-danger btn-sm">
+          Delete
+        </button>
         </td>
       </tr>
-
-              <div class="modal fade" id="delete-`+ res.posts[i].id + `" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Post</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <input type="text" value="">
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-sm btn-primary">Delete Post</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
 
       `;
@@ -96,8 +80,8 @@ $(document).ajaxStart(function () {
 $(document).ajaxStart(function () {
   $(".loader").hide();
 });
-// add post
 
+//Add Post Ajax
 $(document).ready(function () {
   table = "#posts-table";
   modal = "#add-posts-modal";
@@ -105,7 +89,7 @@ $(document).ready(function () {
 
   $(form).on("submit", function (event) {
     event.preventDefault();
-    console.log("hellllo");
+
     var url = $(this).attr("data-action");
     console.log(url);
 
@@ -132,16 +116,79 @@ $(document).ready(function () {
           showPosts();
         }
       },
-      error: function (data) {
-        $.each(data.errors,function(key,value) {
-          console.log(data.errors);
-          console.log(key);
-          console.log(value[0]);
-          $('.'+key+'_error').text(value[0]);
-          });
+      error: function (err) {
+        $.each(err.responseJSON, function (prefix, val) {
+          $('.' + prefix + '_error').text(val[0]);
+        })
 
 
       },
     });
   });
 });
+
+
+
+
+//Delete Post Ajax
+$(document).on('click', 'button#btn-delete', function (e) {
+  e.preventDefault();
+  let dataDelete = $(this).data('id');
+  // console.log(dataDelete);
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this! ",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: 'POST',
+        dataType: 'JSON',
+        url: "http://127.0.0.1:8000/admin" + `/post/${dataDelete}/delete`,
+        data: {
+          '_token': $('meta[name="csrf-token"]').attr('content'),
+        },
+        success: function (response) {
+          Swal.fire(
+            'Deleted!',
+            'Your file has been deleted.',
+            'success'
+          )
+          console.log("your post has been deleted");
+          showPosts();
+        },
+        error: function (err) {
+          console.log(err);
+        }
+      });
+    }
+  })
+});
+
+
+
+//Edit Post AJAX
+//open edit modal
+$(document).on('click', 'button#editPost', function () {
+  let id = $(this).data('id');
+  let dataAction = $(this).data('action');
+  $('#formData').attr('action', dataAction);
+  $.ajax({
+    type: 'GET',
+    url: `http://127.0.0.1:8000/admin/post/${id}/edit`,
+    dataType: "json",
+    success: function (res) {
+      $('input[name=title]').val(res.post.title);
+      $('textarea[name=content]').val(res.post.content);
+      $('#add-posts-modal').modal('show');
+      console.log(res);
+    },
+    error: function (error) {
+      console.log(error)
+    }
+  })
+})

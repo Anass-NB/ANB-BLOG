@@ -12,6 +12,8 @@
   {{-- summernote --}}
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -56,9 +58,10 @@
 
 
             </tbody>
+
             <!--Add Modal -->
-            <div class="modal fade" id="add-posts-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
-              aria-hidden="true">
+            <div class="modal fade" id="add-posts-modal" tabindex="-1" id="exampleModal"
+              aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-xl ">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -167,6 +170,7 @@
                 </div>
               </div>
             </div>
+
           </table>
         </div>
       </div>
@@ -189,4 +193,5 @@
     });
   </script>
   {{-- summernote scripts --}}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
 @endsection

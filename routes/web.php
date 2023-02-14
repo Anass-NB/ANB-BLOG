@@ -24,8 +24,9 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
   Route::get("/posts", [PostController::class, "index"])->name("posts.index");
   Route::post("/posts/store", [PostController::class, "store"])->name("post.store");
-  Route::post("/posts/delete", [PostController::class, "destroy"])->name("post.delete");
-  Route::post("/posts/update", [PostController::class, "update"])->name("post.update");
+  Route::post("/post/{id}/delete", [PostController::class, "destroy"])->name("post.delete");
+  Route::get("/post/{id}/edit", [PostController::class, "edit"])->name("post.edit");
+  Route::post("/post/{id}/update", [PostController::class, "update"])->name("post.update");
 
   Route::get("/categories", [CategoryController::class, "index"])->name("categories.index");
   Route::post("/categories/store", [CategoryController::class, "store"])->name("categories.store");
