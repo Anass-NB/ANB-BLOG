@@ -58,15 +58,8 @@
                   </div>
                 </div>
               @endforeach
-              <div class="pagination__wrap">
-                <ul class="list-wrap">
-                  <li class="active"><a href="#">01</a></li>
-                  <li><a href="#">02</a></li>
-                  <li><a href="#">...</a></li>
-                  <li><a href="#">06</a></li>
-                  <li><a href="#"><i class="fas fa-angle-double-right"></i></a></li>
-                </ul>
-              </div>
+              {{-- @include('pagination::custom') --}}
+              {{ $posts->links('pagination::custom') }}
             </div>
           </div>
           <div class="col-xl-3 col-lg-4 col-md-6">

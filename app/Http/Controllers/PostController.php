@@ -6,6 +6,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Validator;
@@ -66,7 +67,7 @@ class PostController extends Controller
     $post->user_id = $request->author;
     if ($request->hasFile("photo")) {
       $file_name = $request->file("photo")->getClientOriginalName();
-      $request->file("photo")->storeAs("photos/posts/".now()."-". $request->title, $file_name, "upload_photos");
+      $request->file("photo")->storeAs("photos/posts/". $request->title, $file_name, "upload_photos");
       $post->photo = $file_name;
     }
     $post->save();
@@ -127,14 +128,24 @@ class PostController extends Controller
   {
     $post = Post::findOrFail($id);
     $url = "photos/posts/" . $post->title . "/*";
-
+    //delete all photos in the folder
     foreach (glob($url) as  $file) {
       unlink($file);
     }
+    //delete Folder
+    rmdir("photos/posts/" . $post->title);
     $post->delete();
     return response()->json([
       'success' => true,
       'message' => 'Success Deleted post',
     ]);
+  }
+
+  public function getPdf($id)
+  {
+    $post = Post::findOrFail($id);
+    $pdf = Pdf::loadView('pdf.post', compact("post"));
+    return $pdf->download('post.pdf');
+    // return view("pdf.post",compact("post"));
   }
 }

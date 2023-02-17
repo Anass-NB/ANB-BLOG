@@ -38,6 +38,9 @@ function table_post_row(res) {
         <button id="" data-action="/post/update" data-id="res.posts[i].id" class="btn btn-secondary btn-sm">
           Show
         </button>
+        <button id="btn-pdf"  >
+          <a class="btn btn-success btn-sm" href="http://127.0.0.1:8000/admin/post/pdf/`+ res.posts[i].id + `">PDF</a>
+        </button>
         <button id="editPost" data-action="http://127.0.0.1:8000/admin/post/` + res.posts[i].id + `/update" data-id="` + res.posts[i].id + `" class="btn btn-warning btn-sm">
           Edit
         </button>

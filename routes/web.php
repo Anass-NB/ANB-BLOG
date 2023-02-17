@@ -27,6 +27,7 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
   Route::post("/post/{id}/delete", [PostController::class, "destroy"])->name("post.delete");
   Route::get("/post/{id}/edit", [PostController::class, "edit"])->name("post.edit");
   Route::post("/post/{id}/update", [PostController::class, "update"])->name("post.update");
+  Route::get("/post/pdf/{id}", [PostController::class, "getPdf"]);
 
   Route::get("/categories", [CategoryController::class, "index"])->name("categories.index");
   Route::post("/categories/store", [CategoryController::class, "store"])->name("categories.store");
@@ -35,6 +36,5 @@ Route::group(['middleware' => ['auth:web'], 'prefix' => 'admin'], function () {
 
 Route::get("/", [HomeController::class, "index"])->name("posts.front");
 Route::get("/posts/{slug}", [HomeController::class, "show"])->name("posts.show");
-Route::view("/test", "test");
 
 require __DIR__ . '/auth.php';

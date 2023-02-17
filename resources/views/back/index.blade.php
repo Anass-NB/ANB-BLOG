@@ -34,6 +34,7 @@
       <div class="card-body">
         <div class="bg-light rounded h-100 p-4">
           <h6 class="mb-4">All Posts Table</h6>
+          <a target="_blank" href="{{ route('posts.front') }}" class="btn btn-sm btn-secondary">Website</a>
           <!-- Button trigger modal -->
           <button type="button" id="openModal" class="btn btn-info btn-sm" data-action="{{ route('post.store') }}"
             data-bs-toggle="modal" data-bs-target="#add-posts-modal">
